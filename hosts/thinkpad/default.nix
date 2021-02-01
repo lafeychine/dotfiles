@@ -38,6 +38,7 @@
         ssd.enable = true;
       };
       sensors.enable = true;
+      v4l2.enable = true;
     };
     shell = {
       bash.enable = true;
