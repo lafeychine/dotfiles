@@ -41,6 +41,7 @@
       direnv.enable = true;
       git.enable = true;
       gnupg.enable = true;
+      starship.enable = true;
     };
   };
 
