@@ -3,9 +3,22 @@
 # Set up and enforce XDG compliance. Other modules will take care of their own,
 # but this takes care of the general cases.
 
-{ config, home-manager, ... }: {
+{ config, home-manager, pkgs, ... }: {
   ### A tidy $HOME is a tidy mind
   home-manager.users.${config.user.name}.xdg.enable = true;
+
+  services.pipewire.enable = true;
+
+  xdg = {
+    portal = {
+      enable = true;
+      extraPortals = with pkgs; [
+        xdg-desktop-portal-wlr
+        xdg-desktop-portal-gtk
+      ];
+      gtkUsePortal = true;
+    };
+  };
 
   environment = {
     sessionVariables = {

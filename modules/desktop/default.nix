@@ -20,8 +20,6 @@ in {
     ];
 
     user.packages = with pkgs; [
-      pavucontrol
-
       feh # image viewer
       xclip
       xdotool
