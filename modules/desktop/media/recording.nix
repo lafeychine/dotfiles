@@ -4,7 +4,7 @@
 # This, paired with DaVinci Resolve for video editing (on my Windows system) and
 # I have what I need for youtube videos and streaming.
 
-{ config, options, lib, pkgs, ... }:
+{ config, options, lib, pkgs, inputs, ... }:
 
 with lib;
 with lib.my;
@@ -17,10 +17,12 @@ in {
   };
 
   config = mkIf cfg.enable {
+    nixpkgs.overlays = [ inputs.wayland-overlay.overlay ];
+
     user.packages = with pkgs;
     # for recording and remastering audio
       (if cfg.audio.enable then [ audacity ] else [ ]) ++
       # for longer term streaming/recording the screen
-      (if cfg.video.enable then [ obs-studio handbrake ] else [ ]);
+      (if cfg.video.enable then [ obs-studio-dmabuf obs-wlrobs ] else [ ]);
   };
 }
