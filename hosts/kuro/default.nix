@@ -1,9 +1,5 @@
-{ ... }:
-{
-  imports = [
-    ../personal.nix
-    ./hardware-configuration.nix
-  ];
+{ ... }: {
+  imports = [ ../personal.nix ./hardware-configuration.nix ];
 
   ## Modules
   modules = {
@@ -36,9 +32,7 @@
         default = "xst";
         st.enable = true;
       };
-      vm = {
-        qemu.enable = true;
-      };
+      vm = { qemu.enable = true; };
     };
     editors = {
       default = "nvim";
@@ -59,10 +53,10 @@
     shell = {
       bitwarden.enable = true;
       direnv.enable = true;
-      git.enable    = true;
-      gnupg.enable  = true;
-      tmux.enable   = true;
-      zsh.enable    = true;
+      git.enable = true;
+      gnupg.enable = true;
+      tmux.enable = true;
+      zsh.enable = true;
     };
     services = {
       ssh.enable = true;
@@ -71,7 +65,6 @@
     };
     theme.active = "alucard";
   };
-
 
   ## Local config
   programs.ssh.startAgent = true;

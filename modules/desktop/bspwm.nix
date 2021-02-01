@@ -4,9 +4,7 @@ with lib;
 with lib.my;
 let cfg = config.modules.desktop.bspwm;
 in {
-  options.modules.desktop.bspwm = {
-    enable = mkBoolOpt false;
-  };
+  options.modules.desktop.bspwm = { enable = mkBoolOpt false; };
 
   config = mkIf cfg.enable {
     modules.theme.onReload.bspwm = ''

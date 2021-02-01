@@ -52,7 +52,7 @@
       options = [ "noatime" ];
     };
   };
-  swapDevices = [ { device = "/dev/disk/by-label/swap"; }];
+  swapDevices = [{ device = "/dev/disk/by-label/swap"; }];
 
   boot.initrd.luks.devices.home = {
     device = "/dev/nvme0n1p8";

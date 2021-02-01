@@ -49,14 +49,10 @@
 
 { modulesPath, config, lib, pkgs, ... }:
 
-with lib;
-{
-  imports = [
-    "${modulesPath}/profiles/qemu-guest.nix"
-  ];
+with lib; {
+  imports = [ "${modulesPath}/profiles/qemu-guest.nix" ];
 
-  environment.systemPackages =
-    with pkgs; [ inetutils mtr sysstat git ];
+  environment.systemPackages = with pkgs; [ inetutils mtr sysstat git ];
 
   modules = {
     editors = {
@@ -72,13 +68,13 @@ with lib;
 
   # GRUB
   boot = {
-    kernelModules = [];
+    kernelModules = [ ];
     # Needed for LISH (part 1)
     kernelParams = [ "console=ttyS0" ];
-    extraModulePackages = [];
+    extraModulePackages = [ ];
     initrd = {
       availableKernelModules = [ "virtio_pci" "ahci" "sd_mod" ];
-      kernelModules = [];
+      kernelModules = [ ];
     };
     loader = {
       timeout = 10;
@@ -103,14 +99,12 @@ with lib;
   networking = {
     useDHCP = false;
     usePredictableInterfaceNames = false;
-    interfaces.eth0 = {
-      useDHCP = true;
-    };
+    interfaces.eth0 = { useDHCP = true; };
   };
 
   fileSystems."/" = {
     device = "/dev/sda";
     fsType = "ext4";
   };
-  swapDevices = [ { device = "/dev/sdb"; } ];
+  swapDevices = [{ device = "/dev/sdb"; }];
 }

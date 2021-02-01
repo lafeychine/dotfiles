@@ -11,19 +11,22 @@
 
 with lib;
 with lib.my;
-let cfg = config.modules.backup;
+let
+  cfg = config.modules.backup;
 
-    backupType = with types; submodule ({ config, ... }: {
+  backupType = with types;
+    submodule ({ config, ... }: {
       options = {
         enable = mkBoolOpt false;
 
-        name   = mkOpt' str config._module.args.name "Name of this backup";
-        owner  = mkOpt str "backup";
-        group  = mkOpt str users.${config.owner}.group;
-        mode   = mkOpt str "0400";
+        name = mkOpt' str config._module.args.name "Name of this backup";
+        owner = mkOpt str "backup";
+        group = mkOpt str users.${config.owner}.group;
+        mode = mkOpt str "0400";
 
-        baseDir = mkOpt' (either str path) "" "Base directory for backup targets";
-        targets = mkOpt' (listOf (either str path)) [] ''
+        baseDir =
+          mkOpt' (either str path) "" "Base directory for backup targets";
+        targets = mkOpt' (listOf (either str path)) [ ] ''
           List of file globs or paths to files/directories that will be backed
           up (or restored) for this target. Paths are relative to this target's
           baseDir to modules.backup.path.
@@ -39,7 +42,7 @@ let cfg = config.modules.backup;
           contains the restoration destination.
         '';
 
-        suspendServices = mkOpt (listOf str) [] ''
+        suspendServices = mkOpt (listOf str) [ ] ''
           Systemd services to suspend while backing up or restoring this target.
         '';
         maxGenerations = mkOpt' int cfg.maxGenerations ''
@@ -48,7 +51,8 @@ let cfg = config.modules.backup;
       };
     });
 
-    targetBackupScript = target: writeShellScriptBin "backup.sh" ''
+  targetBackupScript = target:
+    writeShellScriptBin "backup.sh" ''
       ${optionalString (target.enable != true) ''
         echo "Skipping ${target.name} (reason: disabled)"
         exit 0
@@ -63,11 +67,13 @@ let cfg = config.modules.backup;
       mkdir -p "$outdir" && cd "$outdir"
 
       # Suspend dependent services
-      ${concatStringSep "\n" (map (s: "systemctl stop ${s}") target.suspendServices)}
+      ${concatStringSep "\n"
+      (map (s: "systemctl stop ${s}") target.suspendServices)}
 
       # Backup individual targets
       ${concatStringSep "\n"
-        (mapAttrsToList (n: v: ''cp -RTfpv "$indir/"${v} "$outdir/"'') target.targets)}
+      (mapAttrsToList (n: v: ''cp -RTfpv "$indir/"${v} "$outdir/"'')
+        target.targets)}
 
       # Launch custom script
       ${optionalString (target.backupScript != "") target.backupScript}
@@ -78,10 +84,12 @@ let cfg = config.modules.backup;
       ln -sf "$basedir/latest" "$outdir"
 
       # Resume services
-      ${concatStringSep "\n" (map (s: "systemctl start ${s}") target.suspendServices)}
+      ${concatStringSep "\n"
+      (map (s: "systemctl start ${s}") target.suspendServices)}
     '';
 
-    targetRestoreScript = target: writeShellScriptBin "restore.sh" ''
+  targetRestoreScript = target:
+    writeShellScriptBin "restore.sh" ''
       set -e
       indir="${cfg.path}/${target.name}/latest"
       outdir="${target.baseDir}"
@@ -89,65 +97,67 @@ let cfg = config.modules.backup;
 
       # Suspend services
       ${concatStringSep "\n"
-        (map (s: "systemctl stop #{s}") target.suspendServices)}
+      (map (s: "systemctl stop #{s}") target.suspendServices)}
 
       # Restore individual targets
       ${concatStringSep "\n"
-        (mapAttrsToList (n: v: ''cp -RTfpv "$indir/"${v} "$outdir/"'') target.targets)}
+      (mapAttrsToList (n: v: ''cp -RTfpv "$indir/"${v} "$outdir/"'')
+        target.targets)}
 
       # Launch custom script
       ${optionalString (target.restoreScript != "") target.restoreScript}
 
       # Resume services
-      ${concatStringSep "\n" (map (s: "systemctl start ${s}") target.suspendServices)}
+      ${concatStringSep "\n"
+      (map (s: "systemctl start ${s}") target.suspendServices)}
     '';
 
-    backupBin = writeShellScriptBin "hey-backup" ''
-      if [[ $1 ]]; then
-        if [[ ! -x ${cfg.path}/$1/backup.sh ]]; then
-          >&2 echo "Could not find backup for #{name}. Aborting..."
-          exit 1
-        fi
-        echo "Backing up $1"
-        $i/backup.sh
-      else
-        echo "Backing up all targets"
-        for i in ${cfg.path}/*; do
-          echo "Backing up: $i"
-          $i/backup.sh
-        done
-      fi
-    '';
-
-    restoreBin = writeShellScriptBin "hey-restore" ''
-      if [[ ! -d ${cfg.path} || -z "$(ls -A ${cfg.path})" ]]; then
-        >&2 echo "No backups on this system. Aborting..."
+  backupBin = writeShellScriptBin "hey-backup" ''
+    if [[ $1 ]]; then
+      if [[ ! -x ${cfg.path}/$1/backup.sh ]]; then
+        >&2 echo "Could not find backup for #{name}. Aborting..."
         exit 1
       fi
-      if [[ $1 ]]; then
-        if [[ ! -x ${cfg.path}/$1/restore.sh ]]; then
-          >&2 echo "Could not find backup for #{name}. Aborting..."
-          exit 1
-        fi
-        echo "Restoring $1"
-        ${cfg.path}/$1/restore.sh
-      else
-        echo "Restoring all targets from latest backup"
-        for i in ${cfg.path}/*; do
-          echo "Restoring backup: $i"
-        done
+      echo "Backing up $1"
+      $i/backup.sh
+    else
+      echo "Backing up all targets"
+      for i in ${cfg.path}/*; do
+        echo "Backing up: $i"
+        $i/backup.sh
+      done
+    fi
+  '';
+
+  restoreBin = writeShellScriptBin "hey-restore" ''
+    if [[ ! -d ${cfg.path} || -z "$(ls -A ${cfg.path})" ]]; then
+      >&2 echo "No backups on this system. Aborting..."
+      exit 1
+    fi
+    if [[ $1 ]]; then
+      if [[ ! -x ${cfg.path}/$1/restore.sh ]]; then
+        >&2 echo "Could not find backup for #{name}. Aborting..."
+        exit 1
       fi
-    '';
+      echo "Restoring $1"
+      ${cfg.path}/$1/restore.sh
+    else
+      echo "Restoring all targets from latest backup"
+      for i in ${cfg.path}/*; do
+        echo "Restoring backup: $i"
+      done
+    fi
+  '';
 in {
   options.modules.backup = with types; {
-    enable         = mkBoolOpt false;
-    path           = mkOpt (either path str) "/run/backups";
-    targets        = mkOpt (attrsOf backupType) {};
-    schedule       = mkOpt str "";   # e.g. "02:00"
+    enable = mkBoolOpt false;
+    path = mkOpt (either path str) "/run/backups";
+    targets = mkOpt (attrsOf backupType) { };
+    schedule = mkOpt str ""; # e.g. "02:00"
     maxGenerations = mkOpt int 5;
   };
 
-  config = mkIf (cfg.enable && cfg.targets != {}) {
+  config = mkIf (cfg.enable && cfg.targets != { }) {
     users.users.backup = {
       description = "The nixos backup service";
       group = "backup";
@@ -155,8 +165,7 @@ in {
       isSystemUser = true;
       useDefaultShell = true;
     };
-    users.groups.backup = {};
-
+    users.groups.backup = { };
 
     system.activationScripts.backupInit = ''
       echo "Generating backup files"
@@ -165,18 +174,17 @@ in {
       chown backup:backup "$BASEDIR"
       chmod 700 "$BASEDIR"
       ${concatStringSep "\n" (mapAttrsToList (n: v: ''
-          echo "Generating backup dir: $BASEDIR"
-          TARGETDIR="$BASEDIR/${v.name}"
-          mkdir -p "$TARGETDIR"
-          chown ${v.owner}:${v.group} "$TARGETDIR"
-          chmod ${v.mode} "$TARGETDIR"
-          cp -f ${targetBackupScript v}/bin/backup.sh "$TARGETDIR/backup.sh"
-          cp -f ${targetRestoreScript v}/bin/restore.sh "$TARGETDIR/restore.sh"
-          chmod 700 {backup,restore}.sh
-        '') cfg.targets)}
+        echo "Generating backup dir: $BASEDIR"
+        TARGETDIR="$BASEDIR/${v.name}"
+        mkdir -p "$TARGETDIR"
+        chown ${v.owner}:${v.group} "$TARGETDIR"
+        chmod ${v.mode} "$TARGETDIR"
+        cp -f ${targetBackupScript v}/bin/backup.sh "$TARGETDIR/backup.sh"
+        cp -f ${targetRestoreScript v}/bin/restore.sh "$TARGETDIR/restore.sh"
+        chmod 700 {backup,restore}.sh
+      '') cfg.targets)}
       echo "Generated backup files!"
     '';
-
 
     systemd.services.hey-backups = {
       description = "Backup system";
@@ -202,9 +210,6 @@ in {
     };
 
     # Add 'bin/hey backup' extensions to PATH
-    environment.systemPackages = [
-      backupBin
-      restoreBin
-    ];
+    environment.systemPackages = [ backupBin restoreBin ];
   };
 }

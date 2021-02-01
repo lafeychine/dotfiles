@@ -2,8 +2,7 @@
 
 { config, lib, ... }:
 
-with lib.my;
-{
+with lib.my; {
   imports = [
     ../personal.nix
     ./hardware-configuration.nix
@@ -13,7 +12,6 @@ with lib.my;
     ./modules/bitwarden.nix
     # ./modules/tinytinyrss.nix
   ];
-
 
   ## Modules
   modules = {
@@ -29,7 +27,6 @@ with lib.my;
 
     theme.active = "alucard";
   };
-
 
   ## Local config
   networking.networkmanager.enable = true;

@@ -4,9 +4,10 @@
   imports = [ "${modulesPath}/installer/scan/not-detected.nix" ];
 
   boot = {
-    initrd.availableKernelModules = [ "nvme" "xhci_pci" "ahci" "usb_storage" "usbhid" "sd_mod" ];
-    initrd.kernelModules = [];
-    extraModulePackages = [];
+    initrd.availableKernelModules =
+      [ "nvme" "xhci_pci" "ahci" "usb_storage" "usbhid" "sd_mod" ];
+    initrd.kernelModules = [ ];
+    extraModulePackages = [ ];
     kernelModules = [ "kvm-amd" ];
     kernelParams = [
       # HACK Disables fixes for spectre, meltdown, L1TF and a number of CPU
@@ -48,7 +49,7 @@
   };
 
   # Storage
-  networking.hostId = "edd9f26b";  # required by zfs
+  networking.hostId = "edd9f26b"; # required by zfs
   fileSystems = {
     "/" = {
       device = "/dev/disk/by-label/nixos";
@@ -85,5 +86,5 @@
       options = [ "nofail" ];
     };
   };
-  swapDevices = [];
+  swapDevices = [ ];
 }
