@@ -25,7 +25,7 @@
   hardware.cpu.intel.updateMicrocode = true;
   hardware.opengl = {
     enable = true;
-    driSupport = true; 
+    driSupport = true;
   };
 
   # Displays

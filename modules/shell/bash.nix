@@ -9,6 +9,6 @@ in {
   config = mkIf cfg.enable {
     users.defaultUserShell = pkgs.bash;
 
-    user.packages = with pkgs; [ bat exa fasd fd fzf htop ripgrep tree ];
+    user.packages = with pkgs; [ bat exa fasd fd fzf htop nixfmt ripgrep tree ];
   };
 }
