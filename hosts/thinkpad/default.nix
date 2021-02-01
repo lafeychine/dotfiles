@@ -13,6 +13,7 @@
       media = {
         recording.enable = true;
         recording.video.enable = true;
+        spotify.enable = true;
       };
       term = {
         default = "alacritty";
