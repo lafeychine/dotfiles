@@ -1,0 +1,202 @@
+#############
+# Variables #
+#############
+# Logo key
+set $mod Mod4
+
+# Terminal emulator
+set $term alacritty
+
+# Application launcher
+set $menu exec $term --class launcher -e bash -c "compgen -c | sort -u | fzf --layout=reverse | xargs -r swaymsg -t command exec"
+
+set $menu_X exec $term --class launcher -e bash -c "compgen -c | sort -u | fzf --layout=reverse | xargs -r swaymsg -t command exec env GDK_BACKEND=x11 QT_QPA_PLATFORM=xcb"
+
+
+# xwayland disable
+
+########################
+# Output configuration #
+########################
+output * bg /home/lafeyc_v/Wallpapers/default.jpg fill
+
+output DP-1 pos 1920 0 res 1920x1200
+output HDMI-A-2 pos 0 0 res 1920x1080
+output eDP-1 pos 0 1080 res 1920x1080
+
+
+#######################
+# Input configuration #
+#######################
+input "1:1:AT_Translated_Set_2_keyboard"
+{
+    xkb_layout us,us
+    xkb_variant ,intl
+    xkb_options grp:ctrls_toggle
+    repeat_delay 200
+}
+
+# input "6700:3620:SEM_USB_Keyboard"
+# {
+#     xkb_layout fr,fr
+#     xkb_variant ,intl
+#     xkb_options grp:ctrls_toggle
+#     repeat_delay 200
+# }
+
+
+################
+# Key bindings #
+################
+bindsym $mod+t exec $term
+
+# Kill focused window
+bindsym $mod+q kill
+
+# Make floating windows
+bindsym $mod+space floating toggle
+floating_modifier Alt normal
+
+# Start the launcher
+bindsym $mod+d exec $menu
+
+# Start the launcher for X applications
+bindsym $mod+x exec $menu_X
+
+# Reload the configuration file
+bindsym $mod+u reload
+
+# Exit Sway
+bindsym $mod+k exec swaymsg exit
+
+
+#######################################
+# Key bindings for windows management #
+#######################################
+# Moving around
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# _move_ the focused window with the same, but add Shift
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# switch to workspace
+bindsym $mod+1 workspace 1
+bindsym $mod+2 workspace 2
+bindsym $mod+3 workspace 3
+bindsym $mod+4 workspace 4
+bindsym $mod+5 workspace 5
+bindsym $mod+6 workspace 6
+bindsym $mod+7 workspace 7
+bindsym $mod+8 workspace 8
+bindsym $mod+9 workspace 9
+bindsym $mod+0 workspace 10
+
+# move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace 1
+bindsym $mod+Shift+2 move container to workspace 2
+bindsym $mod+Shift+3 move container to workspace 3
+bindsym $mod+Shift+4 move container to workspace 4
+bindsym $mod+Shift+5 move container to workspace 5
+bindsym $mod+Shift+6 move container to workspace 6
+bindsym $mod+Shift+7 move container to workspace 7
+bindsym $mod+Shift+8 move container to workspace 8
+bindsym $mod+Shift+9 move container to workspace 9
+bindsym $mod+Shift+0 move container to workspace 10
+
+
+################
+# Layout stuff #
+################
+
+    # You can "split" the current object of your focus with
+    # $mod+b or $mod+v, for horizontal and vertical splits
+    # respectively.
+    bindsym $mod+b splith
+    bindsym $mod+v splitv
+
+    # Make the current focus fullscreen
+    bindsym $mod+f fullscreen
+
+#
+# Resizing containers:
+#
+mode "resize" {
+    # left will shrink the containers width
+    # right will grow the containers width
+    # up will shrink the containers height
+    # down will grow the containers height
+    # ditto, with arrow keys
+    bindsym Left resize shrink width 10px
+    bindsym Down resize grow height 10px
+    bindsym Up resize shrink height 10px
+    bindsym Right resize grow width 10px
+
+    # return to default mode
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+
+#############
+# UI config #
+#############
+# Gruvbox-Dark Pallete
+set $no_color #00000000
+set $black_color #000000
+set $red_color #cc241d
+set $red2_color #fb4934
+set $green_color #98971a
+set $green2_color #d8bb26
+set $yellow_color #d79921
+set $yellow2_color #fabd2f
+set $blue_color #458588
+set $blue2_color #83a598
+set $purple_color #b16286
+set $purple2_color #d3869b
+set $aqua_color #689d6a
+set $aqua2_color #8ec07c
+set $gray_color #a89984
+set $gray2_color #928374
+set $orange_color #d65d0e
+set $orange2_color #928374
+
+set $bg0_color #282828
+set $bg1_color #3c3836
+set $bg2_color #504945
+set $bg3_color #665c54
+set $bg4_color #7c6f64
+set $bg0_h_color #1d2021
+
+set $bg_color $bg0_color
+set $fg_color #ebdbb2
+
+# Gaps
+gaps inner 8
+default_border pixel 0
+
+# Status bar
+bar
+{
+    swaybar_command waybar
+    gaps 8
+
+    colors
+    {
+           statusline $no_color
+           background $black_color70
+           focused_workspace $blue2_color $bg_color $blue2_color
+           active_workspace $bg_color $bg_color $blue2_color
+           inactive_workspace $bg_color $bg_color $fg_color
+    }
+}
+
+for_window [app_id="^launcher$"] floating enable, border none
+for_window [title="^Nightly -"] floating enable, border none
+for_window [title="^Picture-in-Picture$"] floating enable, border none
