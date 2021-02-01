@@ -5,7 +5,10 @@
   modules = {
     desktop = {
       sway.enable = true;
-      apps = { discord.enable = true; };
+      apps = {
+        discord.enable = true;
+        zoom.enable = true;
+      };
       browsers = { firefox.enable = true; };
       media = {
         recording.enable = true;
