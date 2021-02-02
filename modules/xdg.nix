@@ -7,19 +7,6 @@
   ### A tidy $HOME is a tidy mind
   home-manager.users.${config.user.name}.xdg.enable = true;
 
-  services.pipewire.enable = true;
-
-  xdg = {
-    portal = {
-      enable = true;
-      extraPortals = with pkgs; [
-        xdg-desktop-portal-wlr
-        xdg-desktop-portal-gtk
-      ];
-      gtkUsePortal = true;
-    };
-  };
-
   environment = {
     sessionVariables = {
       # These are the defaults, and xdg.enable does set them, but due to load
